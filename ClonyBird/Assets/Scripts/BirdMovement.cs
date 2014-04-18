@@ -6,6 +6,7 @@ public class BirdMovement : MonoBehaviour {
 	public Vector3 gravity;
 	public float flapSpeed;
 	public float forwardSpeed;
+	public bool godMode;
 
 	private Animator animator;
 	private bool dead;
@@ -41,6 +42,10 @@ public class BirdMovement : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D collision) {
+		if (godMode) {
+			return;
+		}
+
 		animator.SetTrigger("Death");
 		dead = true;
 	}
