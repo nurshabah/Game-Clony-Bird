@@ -11,15 +11,40 @@ public class BirdMovement : MonoBehaviour {
 	private Animator animator;
 	private bool dead;
 	private bool flapped;
+	private bool paused;
+	private float deathCooldownRemaining;
+
+	private const float DEATH_COOLDOWN = 1f;
+
+	public bool Dead {
+		get { return dead; }
+	}
 
 	void Start () {
 		flapped = false;
 		dead = false;
+		Pause();
 		animator = GetComponentInChildren<Animator>();
 	}
 
 	void Update() {
-		if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) {
+		bool clicked = Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0);
+
+		if (paused) {
+			if (clicked) {
+				UnPause();
+			} else {
+				return;
+			}
+		}
+
+		if (dead) {
+			deathCooldownRemaining -= Time.deltaTime;
+
+			if (deathCooldownRemaining <= 0 && clicked) {
+				Application.LoadLevel(Application.loadedLevel);
+			}
+		} else if (clicked) {
 			flapped = true;
 		}
 	}
@@ -48,5 +73,16 @@ public class BirdMovement : MonoBehaviour {
 
 		animator.SetTrigger("Death");
 		dead = true;
+		deathCooldownRemaining = DEATH_COOLDOWN;
+	}
+
+	private void Pause() {
+		Time.timeScale = 0;
+		paused = true;
+	}
+
+	private void UnPause() {
+		Time.timeScale = 1;
+		paused = false;
 	}
 }
